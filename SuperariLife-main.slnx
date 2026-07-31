@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="SuperariLife.API/SuperariLife.API.csproj" />
+  <Project Path="SuperariLife.Application/SuperariLife.Application.csproj" />
+  <Project Path="SuperariLife.Common/SuperariLife.Common.csproj" />
+  <Project Path="SuperariLife.Contracts/SuperariLife.Contracts.csproj" />
+  <Project Path="SuperariLife.Database/SuperariLife.Database.csproj" />
+  <Project Path="SuperariLife.Infrastructure/SuperariLife.Infrastructure.csproj" />
+</Solution>
