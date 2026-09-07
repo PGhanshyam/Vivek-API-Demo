@@ -20,7 +20,7 @@ namespace SuperariLife.Infrastructure.DBRepository.Role
             using IDbConnection connection = CreateConnection();
 
             return await connection.QueryAsync<RoleResponseModel>(
-                "dbo.SP_Role_GetAll",
+                "SP_Role_GetAll",
                 commandType: CommandType.StoredProcedure
             );
         }

@@ -12,34 +12,13 @@ namespace SuperariLife.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<
-           IAuthRepository,
-           AuthRepository
-       >();
-
-
-            services.AddScoped<
-                IUserRepository,
-                UserRepository
-            >();
-
-            services.AddScoped<
-                IRoleRepository,
-                RoleRepository
-            >();
-
-            services.AddScoped<
-                ICouponRepository,
-                CouponRepository
-            >();
-
-            services.AddScoped<
-                ICouponTypeRepository,
-                CouponTypeRepository
-            >();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<ICouponRepository, CouponRepository>();
+            services.AddScoped<ICouponTypeRepository, CouponTypeRepository>();
 
             return services;
         }

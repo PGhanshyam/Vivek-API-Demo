@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -23,10 +23,10 @@ namespace SuperariLife.Contracts.Coupon
 
         [Required]
         public DateTime ExpiryDate { get; set; }
+        public string? DiscountType { get; set; }
 
         [Range(0.01, double.MaxValue)]
         public decimal DiscountValue { get; set; }
-
         public bool IsActive { get; set; }
     }
 }

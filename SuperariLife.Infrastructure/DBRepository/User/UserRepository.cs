@@ -1,6 +1,8 @@
-﻿using Dapper;
+using Dapper;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.Configuration;
 using SuperariLife.Application.Models;
+using SuperariLife.Common.Models;
 using SuperariLife.Contracts.User;
 using System;
 using System.Collections.Generic;
@@ -17,11 +19,7 @@ namespace SuperariLife.Infrastructure.DBRepository.User
         {
         }
 
-        public async Task<long> CreateAsync(
-            CreateUserRequestModel request,
-            string passwordHash,
-            long? createdBy
-        )
+        public async Task<long> CreateAsync(CreateUserRequestModel request, string passwordHash, bool mustChangePassword, long? createdBy)
         {
             using IDbConnection connection = CreateConnection();
 
@@ -36,42 +34,60 @@ namespace SuperariLife.Infrastructure.DBRepository.User
             parameters.Add("@PasswordHash", passwordHash);
 
             parameters.Add("@PhoneNo", request.PhoneNo);
-            parameters.Add("@ProfileImage", request.ProfileImage);
+            parameters.Add("@ProfileImage", request.ProfileImagePath);
             parameters.Add("@Address", request.Address);
             parameters.Add("@Country", request.Country);
             parameters.Add("@State", request.State);
             parameters.Add("@City", request.City);
             parameters.Add("@ZipCode", request.ZipCode);
-            parameters.Add("@IsActive", request.IsActive);
+            //parameters.Add("@IsActive", request.IsActive);
             parameters.Add("@CreatedBy", createdBy);
 
+            // New users must change the temporary password
+            parameters.Add("@MustChangePassword", mustChangePassword);
+
             return await connection.QuerySingleAsync<long>(
-                "dbo.sp_User_Insert",
+                "SP_User_Insert",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
         }
-
-        public async Task<IEnumerable<UserResponseModel>> GetAllAsync()
+        public async Task<PagedResult<UserResponseModel>> GetAllAsync(int pageNumber, int pageSize, string? searchText, long? roleId, bool? isActive, string sortColumn, string sortDirection)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection.QueryAsync<UserResponseModel>(
-                "dbo.sp_User_GetAll",
+            var parameters = new DynamicParameters();
+            parameters.Add("@PageNumber", pageNumber);
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@SearchText", searchText);
+            parameters.Add("@RoleId", roleId);
+            parameters.Add("@IsActive", isActive);
+            parameters.Add("@SortColumn", sortColumn);
+            parameters.Add("@SortDirection", sortDirection);
+
+            using var multi = await connection.QueryMultipleAsync(
+                "SP_User_GetAll",
+                parameters,
                 commandType: CommandType.StoredProcedure
             );
-        }
 
-        public async Task<UserResponseModel?> GetByIdAsync(
-            long userId
-        )
+            var users = await multi.ReadAsync<UserResponseModel>();
+            var totalCount = await multi.ReadFirstOrDefaultAsync<int>();
+
+            return new PagedResult<UserResponseModel>
+            { 
+                Items = users,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+        public async Task<UserResponseModel?> GetByIdAsync(long userId)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection.QuerySingleOrDefaultAsync<
-                UserResponseModel   
-            >(
-                "dbo.SP_User_GetById",
+            return await connection.QuerySingleOrDefaultAsync<UserResponseModel>(
+                "SP_User_GetById",
                 new
                 {
                     UserId = userId
@@ -79,18 +95,12 @@ namespace SuperariLife.Infrastructure.DBRepository.User
                 commandType: CommandType.StoredProcedure
             );
         }
-
-        public async Task<OperationResult> UpdateAsync(
-        long userId,
-        UpdateUserRequestModel request,
-        long modifiedBy
-    )
+        public async Task<OperationResult> UpdateAsync(long userId, UpdateUserRequestModel request, long modifiedBy)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection
-                .QuerySingleAsync<OperationResult>(
-                    "dbo.sp_User_Update",
+            return await connection.QuerySingleAsync<OperationResult>(
+                    "SP_User_Update",
                     new
                     {
                         UserId = userId,
@@ -99,29 +109,24 @@ namespace SuperariLife.Infrastructure.DBRepository.User
                         request.LastName,
                         request.Email,
                         request.PhoneNo,
-                        request.ProfileImage,
+                        ProfileImage = request.ProfileImagePath,
                         request.Address,
                         request.Country,
                         request.State,
                         request.City,
                         request.ZipCode,
-                        request.IsActive,
+                        IsActive = request.IsActive,
                         ModifiedBy = modifiedBy
                     },
                     commandType: CommandType.StoredProcedure
                 );
         }
-
-        public async Task<OperationResult> DeleteAsync(
-            long userId,
-            long modifiedBy
-        )
+        public async Task<OperationResult> DeleteAsync(long userId, long modifiedBy)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection
-                .QuerySingleAsync<OperationResult>(
-                    "dbo.sp_User_Delete",
+            return await connection.QuerySingleAsync<OperationResult>(
+                    "SP_User_Delete",
                     new
                     {
                         UserId = userId,

@@ -1,6 +1,7 @@
-﻿using Dapper;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 using SuperariLife.Application.Models;
+using SuperariLife.Common.Models;
 using SuperariLife.Contracts.Coupon;
 using System;
 using System.Collections.Generic;
@@ -11,21 +12,16 @@ namespace SuperariLife.Infrastructure.DBRepository.Coupon
 {
     public class CouponRepository: BaseRepository, ICouponRepository
     {
-        public CouponRepository(
-        IConfiguration configuration
-    ) : base(configuration)
+        public CouponRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
-        public async Task<long> CreateAsync(
-            CreateCouponRequestModel request,
-            long? createdBy
-        )
+        public async Task<long> CreateAsync(CreateCouponRequestModel request, long? createdBy)
         {
             using IDbConnection connection = CreateConnection();
 
             return await connection.QuerySingleAsync<long>(
-                "dbo.SP_Coupon_Insert",
+                "SP_Coupon_Insert",
                 new
                 {
                     request.CouponTypeId,
@@ -33,35 +29,51 @@ namespace SuperariLife.Infrastructure.DBRepository.Coupon
                     request.Description,
                     request.StartDate,
                     request.ExpiryDate,
+                    request.DiscountType,
                     request.DiscountValue,
-                    request.IsActive,
                     CreatedBy = createdBy
                 },
                 commandType: CommandType.StoredProcedure
             );
         }
 
-        public async Task<IEnumerable<CouponResponseModel>>
-            GetAllAsync()
+        public async Task<PagedResult<CouponResponseModel>> GetAllAsync(int pageNumber, int pageSize, string? searchText, int? couponTypeId, bool? isActive, string sortColumn, string sortDirection)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection.QueryAsync<CouponResponseModel>(
-                "dbo.SP_Coupon_GetAll",
+            var parameters = new DynamicParameters();
+            parameters.Add("@PageNumber", pageNumber);
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@SearchText", searchText);
+            parameters.Add("@CouponTypeId", couponTypeId);
+            parameters.Add("@IsActive", isActive);
+            parameters.Add("@SortColumn", sortColumn);
+            parameters.Add("@SortDirection", sortDirection);
+
+            using var multi = await connection.QueryMultipleAsync(
+                "SP_Coupon_GetAll",
+                parameters,
                 commandType: CommandType.StoredProcedure
             );
+
+            var coupons = await multi.ReadAsync<CouponResponseModel>();
+            var totalCount = await multi.ReadFirstOrDefaultAsync<int>();
+
+            return new PagedResult<CouponResponseModel>
+            {
+                Items = coupons,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
-        public async Task<CouponResponseModel?> GetByIdAsync(
-            long couponId
-        )
+        public async Task<CouponResponseModel?> GetByIdAsync(long couponId)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection.QuerySingleOrDefaultAsync<
-                CouponResponseModel
-            >(
-                "dbo.SP_Coupon_GetById",
+            return await connection.QuerySingleOrDefaultAsync<CouponResponseModel>(
+                "SP_Coupon_GetById",
                 new
                 {
                     CouponId = couponId
@@ -70,17 +82,12 @@ namespace SuperariLife.Infrastructure.DBRepository.Coupon
             );
         }
 
-        public async Task<OperationResult> UpdateAsync(
-     long couponId,
-     UpdateCouponRequestModel request,
-     long modifiedBy
- )
+        public async Task<OperationResult> UpdateAsync(long couponId, UpdateCouponRequestModel request, long modifiedBy)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection
-                .QuerySingleAsync<OperationResult>(
-                    "dbo.SP_Coupon_Update",
+            return await connection.QuerySingleAsync<OperationResult>(
+                    "SP_Coupon_Update",
                     new
                     {
                         CouponId = couponId,
@@ -89,32 +96,27 @@ namespace SuperariLife.Infrastructure.DBRepository.Coupon
                         request.Description,
                         request.StartDate,
                         request.ExpiryDate,
+                        request.DiscountType,
                         request.DiscountValue,
                         request.IsActive,
                         ModifiedBy = modifiedBy
                     },
-                    commandType:
-                        CommandType.StoredProcedure
+                    commandType: CommandType.StoredProcedure
                 );
         }
 
-        public async Task<OperationResult> DeleteAsync(
-        long couponId,
-        long modifiedBy
-         )
+        public async Task<OperationResult> DeleteAsync(long couponId, long modifiedBy)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection
-                .QuerySingleAsync<OperationResult>(
-                    "dbo.SP_Coupon_Delete",
+            return await connection.QuerySingleAsync<OperationResult>(
+                    "SP_Coupon_Delete",
                     new
                     {
                         CouponId = couponId,
                         ModifiedBy = modifiedBy
                     },
-                    commandType:
-                        CommandType.StoredProcedure
+                    commandType: CommandType.StoredProcedure
                 );
         }
     }

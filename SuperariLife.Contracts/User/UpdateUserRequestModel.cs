@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -26,9 +27,8 @@ namespace SuperariLife.Contracts.User
 
         [MaxLength(20)]
         public string? PhoneNo { get; set; }
-
-        public string? ProfileImage { get; set; }
-
+        public IFormFile? ProfileImage { get; set; }
+        public string? ProfileImagePath { get; set; }
         public string? Address { get; set; }
 
         [MaxLength(100)]
@@ -42,7 +42,6 @@ namespace SuperariLife.Contracts.User
 
         [MaxLength(20)]
         public string? ZipCode { get; set; }
-
         public bool IsActive { get; set; }
     }
 }

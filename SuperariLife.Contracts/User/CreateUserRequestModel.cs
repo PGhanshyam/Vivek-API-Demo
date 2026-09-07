@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace SuperariLife.Contracts.User
 {
     public class CreateUserRequestModel
     {
         [Required(ErrorMessage = "Role is required.")]
-        [Range(1, long.MaxValue, ErrorMessage = "Please select a valid role.")]
+        [Range(1, 1000, ErrorMessage = "Please select a valid role.")]
         public long RoleId { get; set; }
 
         [Required(ErrorMessage = "First name is required.")]
@@ -24,15 +25,14 @@ namespace SuperariLife.Contracts.User
         [MaxLength(255)]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required.")]
-        [MinLength(6, ErrorMessage = "Password must contain at least 6 characters.")]
-        public string PasswordHash { get; set; } = string.Empty;
+        //[Required(ErrorMessage = "Password is required.")]
+        //[MinLength(6, ErrorMessage = "Password must contain at least 6 characters.")]
+        //public string? PasswordHash { get; set; } = string.Empty;
 
         [MaxLength(20)]
         public string? PhoneNo { get; set; }
-
-        public string? ProfileImage { get; set; }
-
+        public IFormFile? ProfileImage { get; set; }
+        public string? ProfileImagePath { get; set; }
         public string? Address { get; set; }
 
         [MaxLength(100)]
@@ -46,7 +46,6 @@ namespace SuperariLife.Contracts.User
 
         [MaxLength(20)]
         public string? ZipCode { get; set; }
-
         public bool IsActive { get; set; } = true;
     }
 }

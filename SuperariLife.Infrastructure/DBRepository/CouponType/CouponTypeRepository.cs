@@ -10,19 +10,16 @@ namespace SuperariLife.Infrastructure.DBRepository.CouponType
 {
     public class CouponTypeRepository :BaseRepository, ICouponTypeRepository
     {
-        public CouponTypeRepository(
-       IConfiguration configuration
-   ) : base(configuration)
+        public CouponTypeRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
-        public async Task<IEnumerable<CouponTypeResponseModel>>
-            GetAllAsync()
+        public async Task<IEnumerable<CouponTypeResponseModel>>GetAllAsync()
         {
             using IDbConnection connection = CreateConnection();
 
             return await connection.QueryAsync<CouponTypeResponseModel>(
-                "dbo.SP_CouponType_GetAll",
+                "SP_CouponType_GetAll",
                 commandType: CommandType.StoredProcedure
             );
         }

@@ -9,16 +9,9 @@ namespace SuperariLife.Application.Auth
 {
     public interface IAuthService
     {
-        Task<LoginResponseModel> LoginAsync(
-             LoginRequestModel request
-        );
-
-        Task<OperationResult> ForgotPasswordAsync(
-        ForgotPasswordRequestModel request
-        );
-
-        Task<OperationResult> ResetPasswordAsync(
-            ResetPasswordRequestModel request
-        );
+        Task<LoginResponseModel> LoginAsync(LoginRequestModel request);
+        Task<OperationResult> CreateResetTokenAsync(ForgotPasswordRequestModel request);
+        Task<OperationResult> ResetPasswordAsync(ResetPasswordRequestModel request);
+        Task<OperationResult> ChangePasswordAsync(long userId, ChangePasswordRequestModel request);
     }
 }

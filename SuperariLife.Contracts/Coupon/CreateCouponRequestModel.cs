@@ -23,14 +23,10 @@ namespace SuperariLife.Contracts.Coupon
 
         [Required(ErrorMessage = "Expiry date is required.")]
         public DateTime ExpiryDate { get; set; }
+        public string? DiscountType { get; set; } 
 
-        [Range(
-            0.01,
-            double.MaxValue,
-            ErrorMessage = "Discount value must be greater than zero."
-        )]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Discount value must be greater than zero.")]
         public decimal DiscountValue { get; set; }
-
         public bool IsActive { get; set; } = true;
     }
 }

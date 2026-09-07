@@ -5,6 +5,7 @@ using SuperariLife.Contracts.Authentication;
 using SuperariLife.Contracts.Settings;
 using SuperariLife.Infrastructure;
 using System.Text;
+using SuperariLife.Application.EmailServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,29 +23,16 @@ builder.Services.AddSwaggerGen();
 
 //builder.Services.AddOpenApi();
 
-builder.Services
-    .Configure<JwtSettings>(
-        builder.Configuration
-            .GetSection("Jwt")
-    );
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
-var jwtSettings =
-    builder.Configuration
-        .GetSection("Jwt")
-        .Get<JwtSettings>();
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
-builder.Services
-    .AddAuthentication(
-        JwtBearerDefaults
-            .AuthenticationScheme
-    )
-    .AddJwtBearer(
-        options =>
-        {
-            options.TokenValidationParameters =
-                new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
 
                     ValidateAudience = true,
 
@@ -52,26 +40,35 @@ builder.Services
 
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer =
-                        jwtSettings!.Issuer,
+                    ValidIssuer = jwtSettings!.Issuer,
 
-                    ValidAudience =
-                        jwtSettings.Audience,
+                    ValidAudience = jwtSettings.Audience,
 
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(
-                                jwtSettings.Key
-                            )
-                        ),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
 
-                    ClockSkew =
-                        TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero
                 };
         }
     );
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+                policy
+                .WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -89,6 +86,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngular");
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 

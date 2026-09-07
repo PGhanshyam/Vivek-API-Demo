@@ -13,10 +13,7 @@ namespace SuperariLife.API.Controllers
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
-
-        public RolesController(
-            IRoleService roleService
-        )
+        public RolesController(IRoleService roleService)
         {
             _roleService = roleService;
         }
@@ -24,15 +21,12 @@ namespace SuperariLife.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var roles =
-                await _roleService.GetAllAsync();
+            var roles = await _roleService.GetAllAsync();
 
-            return Ok(
-                new ApiResponse<IEnumerable<RoleResponseModel>>
+            return Ok(new ApiResponse<IEnumerable<RoleResponseModel>>
                 {
                     IsSuccess = true,
-                    Message =
-                        "Roles retrieved successfully.",
+                    Message = "Roles retrieved successfully.",
                     Data = roles
                 }
             );

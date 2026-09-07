@@ -8,23 +8,14 @@ namespace SuperariLife.Application.CouponType
 {
     public class CouponTypeService : ICouponTypeService
     {
-        private readonly
-        ICouponTypeRepository _couponTypeRepository;
-
-        public CouponTypeService(
-            ICouponTypeRepository couponTypeRepository
-        )
+        private readonly ICouponTypeRepository _couponTypeRepository;
+        public CouponTypeService(ICouponTypeRepository couponTypeRepository)
         {
-            _couponTypeRepository =
-                couponTypeRepository;
+            _couponTypeRepository = couponTypeRepository;
         }
-
-        public async Task<
-            IEnumerable<CouponTypeResponseModel>
-        > GetAllAsync()
+        public async Task<IEnumerable<CouponTypeResponseModel>> GetAllAsync()
         {
-            return await _couponTypeRepository
-                .GetAllAsync();
+            return await _couponTypeRepository.GetAllAsync();
         }
     }
 }

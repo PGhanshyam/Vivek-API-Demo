@@ -12,32 +12,21 @@ namespace SuperariLife.API.Controllers
     [Authorize(Roles = "Admin")]
     public class CouponTypesController : ControllerBase
     {
-        private readonly
-        ICouponTypeService _couponTypeService;
-
-        public CouponTypesController(
-            ICouponTypeService couponTypeService
-        )
+        private readonly ICouponTypeService _couponTypeService;
+        public CouponTypesController(ICouponTypeService couponTypeService)
         {
-            _couponTypeService =
-                couponTypeService;
+            _couponTypeService = couponTypeService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var couponTypes =
-                await _couponTypeService
-                    .GetAllAsync();
+            var couponTypes = await _couponTypeService.GetAllAsync();
 
-            return Ok(
-                new ApiResponse<
-                    IEnumerable<CouponTypeResponseModel>
-                >
+            return Ok(new ApiResponse<IEnumerable<CouponTypeResponseModel>>
                 {
                     IsSuccess = true,
-                    Message =
-                        "Coupon types retrieved successfully.",
+                    Message = "Coupon types retrieved successfully.",
                     Data = couponTypes
                 }
             );

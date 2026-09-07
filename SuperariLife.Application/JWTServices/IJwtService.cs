@@ -7,8 +7,6 @@ namespace SuperariLife.Application.JWTServices
 {
     public interface IJwtService
     {
-        string GenerateToken(
-        LoginUserResponseModel user
-    );
+        string GenerateToken(LoginUserResponseModel user);
     }
 }

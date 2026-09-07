@@ -9,16 +9,11 @@ namespace SuperariLife.Application.Role
     public class RoleService : IRoleService
     {
         private readonly IRoleRepository _roleRepository;
-
-        public RoleService(
-            IRoleRepository roleRepository
-        )
+        public RoleService(IRoleRepository roleRepository)
         {
             _roleRepository = roleRepository;
         }
-
-        public async Task<IEnumerable<RoleResponseModel>>
-            GetAllAsync()
+        public async Task<IEnumerable<RoleResponseModel>> GetAllAsync()
         {
             return await _roleRepository.GetAllAsync();
         }

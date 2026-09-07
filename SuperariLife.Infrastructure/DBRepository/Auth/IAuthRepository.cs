@@ -9,12 +9,8 @@ namespace SuperariLife.Infrastructure.DBRepository.Auth
     public interface IAuthRepository
     {
         Task<LoginUserResponseModel?> GetUserByEmailAsync(string email);
-
-        Task CreateResetTokenAsync(
-            string email,
-            string resetPasswordToken,
-            DateTime expiry
-        );
+        Task<LoginUserResponseModel?> GetUserByIdAsync(long userId);
+        Task CreateResetTokenAsync(string email, string resetPasswordToken); //DateTime expiry
 
         //Task<OperationResult>
         //ForgotPasswordAsync(
@@ -22,10 +18,7 @@ namespace SuperariLife.Infrastructure.DBRepository.Auth
         //    string resetPasswordToken
         //);
 
-        Task<OperationResult>
-            ResetPasswordAsync(
-                string resetPasswordToken,
-                string passwordHash
-            );
+        Task<OperationResult> ResetPasswordAsync(string resetPasswordToken, string passwordHash);
+        Task<OperationResult> ChangePasswordAsync(long userId, string passwordHash);
     }
 }

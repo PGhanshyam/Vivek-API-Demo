@@ -12,69 +12,49 @@ namespace SuperariLife.Infrastructure.DBRepository.Auth
 {
     public class AuthRepository: BaseRepository, IAuthRepository
     {
-        public AuthRepository(
-        IConfiguration configuration
-    ) : base(configuration)
+        public AuthRepository(IConfiguration configuration) : base(configuration)
         {
         }
 
-        public async Task<LoginUserResponseModel?> GetUserByEmailAsync(
-            string email)
+        public async Task<LoginUserResponseModel?> GetUserByEmailAsync(string email)
         {
             using IDbConnection connection = CreateConnection();
 
-            var parameters =
-                new DynamicParameters();
+            var parameters = new DynamicParameters();
 
-            parameters.Add(
-                "@Email",
-                email
-            );
+            parameters.Add("@Email", email);
 
-            var user =
-                await connection
-                    .QueryFirstOrDefaultAsync<
-                        LoginUserResponseModel
-                    >(
+            var user = await connection.QueryFirstOrDefaultAsync<LoginUserResponseModel>(
                         "SP_User_Login",
                         parameters,
-                        commandType:
-                            CommandType.StoredProcedure
+                        commandType: CommandType.StoredProcedure
                     );
 
             return user;
         }
 
-        public async Task CreateResetTokenAsync(
-        string email,
-        string resetToken,
-        DateTime resetTokenExpiry
-    )
+        public async Task CreateResetTokenAsync(string email, string resetToken) //DateTime resetTokenExpiry
         {
             using IDbConnection connection = CreateConnection();
 
             await connection.ExecuteAsync(
-                "dbo.SP_User_CreateResetToken",
+                "SP_User_CreateResetToken",
                 new
                 {
                     Email = email,
-                    ResetToken = resetToken,
-                    ResetTokenExpiry = resetTokenExpiry
+                    ResetPasswordToken = resetToken,
+                    //ResetTokenExpiry = resetTokenExpiry
                 },
                 commandType: CommandType.StoredProcedure
             );
         }
 
-        public async Task<OperationResult> ResetPasswordAsync(
-            string resetToken,
-            string passwordHash
-        )
+        public async Task<OperationResult> ResetPasswordAsync(string resetToken, string passwordHash)
         {
             using IDbConnection connection = CreateConnection();
 
-            return await connection
-                .QuerySingleAsync<OperationResult>(
-                    "dbo.SP_User_ResetPassword",
+            return await connection.QuerySingleAsync<OperationResult>(
+                    "SP_User_ResetPassword",
                     new
                     {
                         ResetToken = resetToken,
@@ -84,5 +64,32 @@ namespace SuperariLife.Infrastructure.DBRepository.Auth
                 );
         }
 
+        public async Task<OperationResult> ChangePasswordAsync(long userId, string passwordHash)
+        {
+            using IDbConnection connection = CreateConnection();
+
+            return await connection.QuerySingleAsync<OperationResult>(
+                "SP_User_ChangePassword",
+                new
+                {
+                    UserId = userId,
+                    PasswordHash = passwordHash
+                },
+                commandType: CommandType.StoredProcedure
+            );
+        }
+        public async Task<LoginUserResponseModel?> GetUserByIdAsync(long userId)
+        {
+            using IDbConnection connection = CreateConnection();
+
+            return await connection.QueryFirstOrDefaultAsync<LoginUserResponseModel>(
+                "SP_GetByIdForPasswordChange",
+                new
+                {
+                    UserId = userId
+                },
+                commandType: CommandType.StoredProcedure
+            );
+        }
     }
 }

@@ -10,7 +10,6 @@ namespace SuperariLife.Infrastructure
     public abstract class BaseRepository
     {
         private readonly string _connectionString;
-
         protected BaseRepository(IConfiguration configuration)
         {
             _connectionString =
@@ -19,7 +18,6 @@ namespace SuperariLife.Infrastructure
                     "Connection string 'DefaultConnection' was not found."
                 );
         }
-
         protected IDbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);
