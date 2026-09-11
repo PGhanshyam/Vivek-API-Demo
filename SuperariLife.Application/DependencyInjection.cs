@@ -4,6 +4,7 @@ using SuperariLife.Application.Coupon;
 using SuperariLife.Application.CouponType;
 using SuperariLife.Application.JWTServices;
 using SuperariLife.Application.Role;
+using SuperariLife.Application.SettingsModule;
 using SuperariLife.Application.User;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,9 @@ namespace SuperariLife.Application
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ICouponService, CouponService>();
             services.AddScoped<ICouponTypeService, CouponTypeService>();
+            services.AddScoped<ISettingContentService, SettingContentService>();
+            services.AddScoped<ITestimonialService, TestimonialService>();
+            services.AddScoped<IGeneralSettingsService, GeneralSettingsService>();
 
             return services;
         }

@@ -3,6 +3,7 @@ using SuperariLife.Infrastructure.DBRepository.Auth;
 using SuperariLife.Infrastructure.DBRepository.Coupon;
 using SuperariLife.Infrastructure.DBRepository.CouponType;
 using SuperariLife.Infrastructure.DBRepository.Role;
+using SuperariLife.Infrastructure.DBRepository.SettingsModule;
 using SuperariLife.Infrastructure.DBRepository.User;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace SuperariLife.Infrastructure
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<ICouponRepository, CouponRepository>();
             services.AddScoped<ICouponTypeRepository, CouponTypeRepository>();
+            services.AddScoped<ISettingContentRepository, SettingContentRepository>();
+            services.AddScoped<ITestimonialRepository, TestimonialRepository>();
+            services.AddScoped<IGeneralSettingsRepository, GeneralSettingsRepository>();
 
             return services;
         }
